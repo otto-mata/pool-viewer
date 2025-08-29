@@ -1,11 +1,24 @@
 from otto_api42 import intra
 from html import escape as html_escape
+import sys
+
+pyear = 2025
+pmonth = "august"
+if len(sys.argv) == 3:
+    pyear = int(sys.argv[1])
+    pmonth = sys.argv[2]
 
 client = intra.IntraAPIClient("config.yml")
-users = client.pages_threaded("campus/1/users", params={"filter[pool_year]": 2025, "filter[pool_month]": "august"})
-html = """<!DOCTYPE html>
+users = client.pages_threaded(
+    "campus/1/users", params={"filter[pool_year]": pyear, "filter[pool_month]": pmonth}
+)
+html = (
+    """<!DOCTYPE html>
 <html>
     <head>
+        <title>"""
+    + f"Pool viewer - {pmonth} {pyear}"
+    + """</title>
         <style>
           body,
           html {
@@ -52,8 +65,9 @@ html = """<!DOCTYPE html>
     </head>
 	<body>
 		<div class="grid">"""
+)
 for user in users:
-	html += f"""
+    html += f"""
 			<div class="card">
 				<a href="https://profile.intra.42.fr/users/{user.login}" target="_blank">
 					<div class="card-content">
@@ -73,4 +87,4 @@ html += """
 
 
 with open("index.html", "w") as f:
-	f.write(html)
+    f.write(html)
